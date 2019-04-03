@@ -21,6 +21,27 @@ def read_wvmmatch(read_dir_ , sideband):
     data['sideband']=sideband
     return(data)
 
+def read_wvmmatch2(read_dir_ , sideband,receptors ):
+    recep1 = receptors[0]
+    recep2 = receptors[1:len(receptors)]
+
+    H1=pd.read_csv(read_dir_+'wvmmatched_H01'+sideband+'.txt', index_col=0)
+
+    H1['recep']=recep1  #H00 doesn't use since it's not working now
+    H1=H1[H1['trx'].diff()!=0] #remove some Trx data
+    H1=H1.reset_index(drop=True)
+
+    for i in np.arange(len(recep2)):
+        HX=pd.read_csv(read_dir_+'wvmmatched_H'+ recep2[i] + sideband+ '.txt', index_col=0)
+        HX=HX[HX['trx'].diff()!=0] #remove some Trx data
+        HX=HX.reset_index(drop=True)
+        HX['recep']=recep2[i]
+        H1=H1.append(HX)
+    data=H1.reset_index(drop=True)
+    data['sideband']=sideband
+    return(data)
+
+
 def read_merged(read_dir_ , sideband):
     X= ['02','03','04','05','06','07','08','09','10','11','12','15'] #receptor number start 0
     names=['utdate', 'obsnum', 'subsysnr', 'lofreq', 'iffreq', 'rffreq', 'trx', 'tsys']
